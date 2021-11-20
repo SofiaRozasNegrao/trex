@@ -3,6 +3,7 @@ var chao, chaoImagem
 var invisibleChao
 var nuvemImg
 var cacto1,cacto2,cacto3,cacto4,cacto5,cacto6
+var pontuacao=0;
 
 function criaNuvem(){
 
@@ -11,17 +12,32 @@ function criaNuvem(){
     nuvem.velocityX=-2
     nuvem.y= Math.round(random(10,90))
     nuvem.addImage(nuvemImg);
+    nuvem.lifetime=325
     nuvem.depth=trex.depth
     trex.depth=trex.depth+1
-    console.log(trex.depth)  
-    console.log(nuvem.depth)
   }
 }
 
 function criaCactos(){
-  if(frameCount % 70=== 0){
-    var cacto=createSprite(600,150,10,50)
+  if(frameCount % 120=== 0){
+    var cacto=createSprite(600,160,10,50)
     cacto.velocityX=-2
+    cacto.lifetime=350;
+    var tipo=Math.round(random(1,6))
+    switch(tipo){
+      case 1: cacto.addImage(cacto1)
+      break
+      case 2: cacto.addImage(cacto2)
+      break
+      case 3: cacto.addImage(cacto3)
+      break
+      case 4: cacto.addImage(cacto4)
+      break
+      case 5: cacto.addImage(cacto5)
+      break
+      case 6: cacto.addImage(cacto6)
+      break
+    }
   }
 }
 
@@ -51,6 +67,9 @@ function setup(){
 
 function draw(){
   background("white")
+
+  text("Pontuação: "+pontuacao,50,20)
+  pontuacao=pontuacao+Math.round(frameRate()/60)
 
   trex.velocityY = trex.velocityY + 0.5;
   if (keyDown('space') &&trex.y>140){
