@@ -1,10 +1,12 @@
-var trex, trexCorrendo
+var trex, trexCorrendo, trexMorrido
 var chao, chaoImagem
 var invisibleChao
 var nuvemImg
 var cacto1,cacto2,cacto3,cacto4,cacto5,cacto6
 var pontuacao=0;
 var estadoDoJogo="jogando";
+var gameOver, gameOverImg
+var restart, restartImg
 var grupoCacto, grupoNuvem
 
 function criaNuvem(){
@@ -47,6 +49,7 @@ function criaCactos(){
 
 function preload(){
   trexCorrendo = loadAnimation('trex1.png', 'trex3.png', 'trex4.png')
+  trexMorrido= loadAnimation('trex_collided.png')
   chaoImagem=loadImage('ground2.png')
   nuvemImg=loadImage('cloud.png')
   cacto1=loadImage('obstacle1.png')
@@ -55,6 +58,8 @@ function preload(){
   cacto4=loadImage('obstacle4.png')
   cacto5=loadImage('obstacle5.png')
   cacto6=loadImage('obstacle6.png')
+  gameOverImg=loadImage('gameOver.png')
+ //restartImg=loadImage('')
 }
 
 function setup(){
@@ -62,6 +67,7 @@ function setup(){
   
   trex = createSprite(50, 150, 20, 40)
   trex.addAnimation('correndo', trexCorrendo)
+  trex.addAnimation('Morrido', trexMorrido)
 
   chao=createSprite(300,190,600,20);
   chao.addImage(chaoImagem);
@@ -91,7 +97,12 @@ function draw(){
   } else if(estadoDoJogo==="final"){
     chao.velocityX=0;
     grupoNuvem.setVelocityXEach(0);
-    grupoCacto.setVelocityXEach(0)
+    grupoCacto.setVelocityXEach(0);
+
+    grupoNuvem.setLifetimeEach(-1);
+    grupoCacto.setLifetimeEach(-1);
+
+    trex.changeAnimation('Morrido',trexMorrido)
   }
 
   text("Pontuação: "+pontuacao,50,20)
