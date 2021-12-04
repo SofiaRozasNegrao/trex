@@ -4,6 +4,8 @@ var invisibleChao
 var nuvemImg
 var cacto1,cacto2,cacto3,cacto4,cacto5,cacto6
 var pontuacao=0;
+var estadoDoJogo="jogando";
+var grupoCacto, grupoNuvem
 
 function criaNuvem(){
 
@@ -15,6 +17,7 @@ function criaNuvem(){
     nuvem.lifetime=325
     nuvem.depth=trex.depth
     trex.depth=trex.depth+1
+    grupoNuvem.add(nuvem)
   }
 }
 
@@ -38,6 +41,7 @@ function criaCactos(){
       case 6: cacto.addImage(cacto6)
       break
     }
+    grupoCacto.add(cacto)
   }
 }
 
@@ -63,28 +67,41 @@ function setup(){
   chao.addImage(chaoImagem);
   invisibleChao=createSprite(300,199,600,18);
   invisibleChao.visible=false;
+
+  grupoCacto=new Group()
+  grupoNuvem=new Group()
 }
 
 function draw(){
   background("white")
 
+  if(estadoDoJogo==="jogando"){
+    pontuacao=pontuacao+Math.round(frameRate()/60)
+    if(chao.x<0){
+      chao.x=chao.width/2;
+    }
+    criaNuvem()
+    criaCactos()
+
+    chao.velocityX=-2;
+
+    if(trex.isTouching(grupoCacto)){
+      estadoDoJogo="final";
+    }
+  } else if(estadoDoJogo==="final"){
+    chao.velocityX=0;
+    grupoNuvem.setVelocityXEach(0);
+    grupoCacto.setVelocityXEach(0)
+  }
+
   text("Pontuação: "+pontuacao,50,20)
-  pontuacao=pontuacao+Math.round(frameRate()/60)
 
   trex.velocityY = trex.velocityY + 0.5;
   if (keyDown('space') &&trex.y>140){
     trex.velocityY = -10
   }
 
-  chao.velocityX=-2;
-  if(chao.x<0){
-    chao.x=chao.width/2;
-  }
-
   trex.collide(invisibleChao);
-
-  criaNuvem()
-  criaCactos()
 
   drawSprites()
 }
