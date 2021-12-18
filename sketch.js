@@ -8,6 +8,7 @@ var estadoDoJogo="jogando";
 var gameOver, gameOverImg
 var restart, restartImg
 var grupoCacto, grupoNuvem
+var somDaMorte, somDoCheckpoint, somPulo
 
 function criaNuvem(){
 
@@ -26,7 +27,7 @@ function criaNuvem(){
 function criaCactos(){
   if(frameCount % 120=== 0){
     var cacto=createSprite(600,160,10,50)
-    cacto.velocityX=-2
+    cacto.velocityX=-(2+pontuacao/100);
     cacto.lifetime=350;
     var tipo=Math.round(random(1,6))
     switch(tipo){
@@ -47,6 +48,17 @@ function criaCactos(){
   }
 }
 
+function reset(){
+  estadoDoJogo="jogando"
+  grupoCacto.destroyEach()
+  grupoNuvem.destroyEach()
+  pontuacao=0
+  gameOver.visible=false
+  restart.visible=false
+  trex.changeAnimation('correndo', trexCorrendo)
+  
+}
+
 function preload(){
   trexCorrendo = loadAnimation('trex1.png', 'trex3.png', 'trex4.png')
   trexMorrido= loadAnimation('trex_collided.png')
@@ -59,7 +71,10 @@ function preload(){
   cacto5=loadImage('obstacle5.png')
   cacto6=loadImage('obstacle6.png')
   gameOverImg=loadImage('gameOver.png')
- //restartImg=loadImage('')
+ restartImg=loadImage('restart.png')
+ somPulo=loadSound('jump.mp3')
+ somDaMorte=loadSound('die.mp3')
+ somDoCheckpoint=loadSound('checkpoint.mp3')
 }
 
 function setup(){
@@ -76,6 +91,17 @@ function setup(){
 
   grupoCacto=new Group()
   grupoNuvem=new Group()
+
+  gameOver=createSprite(300,50,50,50)
+  gameOver.addImage(gameOverImg)
+  gameOver.visible=false
+
+  restart=createSprite(300,100,50,50)
+  restart.addImage(restartImg)
+  restart.scale=0.6
+  restart.visible=false
+  restart.depth=trex.depth
+  restart.depth=restart.depth+1
 }
 
 function draw(){
@@ -83,16 +109,21 @@ function draw(){
 
   if(estadoDoJogo==="jogando"){
     pontuacao=pontuacao+Math.round(frameRate()/60)
+    if (pontuacao>0 && pontuacao %100 === 0){
+      somDoCheckpoint.play()
+    }
+
     if(chao.x<0){
       chao.x=chao.width/2;
     }
     criaNuvem()
     criaCactos()
 
-    chao.velocityX=-2;
+    chao.velocityX=-(2+pontuacao/100);
 
     if(trex.isTouching(grupoCacto)){
       estadoDoJogo="final";
+      somDaMorte.play()
     }
   } else if(estadoDoJogo==="final"){
     chao.velocityX=0;
@@ -103,6 +134,13 @@ function draw(){
     grupoCacto.setLifetimeEach(-1);
 
     trex.changeAnimation('Morrido',trexMorrido)
+
+    gameOver.visible=true
+    restart.visible=true
+
+    if(mousePressedOver(restart)){
+      reset()
+    }
   }
 
   text("Pontuação: "+pontuacao,50,20)
@@ -110,6 +148,7 @@ function draw(){
   trex.velocityY = trex.velocityY + 0.5;
   if (keyDown('space') &&trex.y>140){
     trex.velocityY = -10
+    somPulo.play()
   }
 
   trex.collide(invisibleChao);
