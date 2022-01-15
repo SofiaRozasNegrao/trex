@@ -9,15 +9,16 @@ var gameOver, gameOverImg
 var restart, restartImg
 var grupoCacto, grupoNuvem
 var somDaMorte, somDoCheckpoint, somPulo
+var larguraTela= window.innerWidth
 
 function criaNuvem(){
 
   if(frameCount % 100 ===0){
-    var nuvem=createSprite(600,50,50,10)
+    var nuvem=createSprite(larguraTela,50,50,10)
     nuvem.velocityX=-2
     nuvem.y= Math.round(random(10,90))
     nuvem.addImage(nuvemImg);
-    nuvem.lifetime=325
+    nuvem.lifetime=larguraTela
     nuvem.depth=trex.depth
     trex.depth=trex.depth+1
     grupoNuvem.add(nuvem)
@@ -26,9 +27,9 @@ function criaNuvem(){
 
 function criaCactos(){
   if(frameCount % 120=== 0){
-    var cacto=createSprite(600,160,10,50)
+    var cacto=createSprite(larguraTela,160,10,50)
     cacto.velocityX=-(2+pontuacao/100);
-    cacto.lifetime=350;
+    cacto.lifetime=larguraTela;
     var tipo=Math.round(random(1,6))
     switch(tipo){
       case 1: cacto.addImage(cacto1)
@@ -78,25 +79,25 @@ function preload(){
 }
 
 function setup(){
-  createCanvas(600,200)
+  createCanvas(larguraTela,200)
   
   trex = createSprite(50, 150, 20, 40)
   trex.addAnimation('correndo', trexCorrendo)
   trex.addAnimation('Morrido', trexMorrido)
 
-  chao=createSprite(300,190,600,20);
+  chao=createSprite(larguraTela/2,190,larguraTela,20);
   chao.addImage(chaoImagem);
-  invisibleChao=createSprite(300,199,600,18);
+  invisibleChao=createSprite(larguraTela/2,199,larguraTela,18);
   invisibleChao.visible=false;
 
   grupoCacto=new Group()
   grupoNuvem=new Group()
 
-  gameOver=createSprite(300,50,50,50)
+  gameOver=createSprite(larguraTela/2,50,50,50)
   gameOver.addImage(gameOverImg)
   gameOver.visible=false
 
-  restart=createSprite(300,100,50,50)
+  restart=createSprite(larguraTela/2,100,50,50)
   restart.addImage(restartImg)
   restart.scale=0.6
   restart.visible=false
@@ -138,17 +139,19 @@ function draw(){
     gameOver.visible=true
     restart.visible=true
 
-    if(mousePressedOver(restart)){
+    if(mousePressedOver(restart) || touches.length>0){
       reset()
+      touches=[]
     }
   }
 
   text("Pontuação: "+pontuacao,50,20)
 
   trex.velocityY = trex.velocityY + 0.5;
-  if (keyDown('space') &&trex.y>140){
+  if ((keyDown('space') &&trex.y>140) || touches.length>0){
     trex.velocityY = -10
     somPulo.play()
+    touches=[]
   }
 
   trex.collide(invisibleChao);
